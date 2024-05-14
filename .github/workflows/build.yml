@@ -1,0 +1,36 @@
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Emscripten compiler
+        run: sudo apt-get update && sudo apt-get install emscripten
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Download and build keystone
+        run: |
+          git clone -b 0.9.2 https://github.com/keystone-engine/keystone
+          cmake -B keystone-build -DCMAKE_C_COMPILER=emcc -DCMAKE_CXX_COMPILER=em++ -DCMAKE_INSTALL_PREFIX=/usr/local/wasm -Wno-dev keystone
+          make -C keystone-build -j$(nproc)
+          sudo make -C keystone-build install
+
+      - name: Download and build capstone
+        run: |
+          git clone -b 5.0.1 https://github.com/capstone-engine/capstone
+          cmake -B capstone-build -DCMAKE_C_COMPILER=emcc -DCMAKE_CXX_COMPILER=em++ -DCMAKE_INSTALL_PREFIX=/usr/local/wasm -Wno-dev capstone
+          make -C capstone-build -j$(nproc)
+          sudo make -C capstone-build install
+
+      - name: Compile
+        run: make
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: |
+            *.html
+            *.js
+            *.wasm
