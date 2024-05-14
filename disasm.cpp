@@ -154,6 +154,16 @@ const char *disassemble(const char *_arch_mode, const char *codehex, uint64_t st
 		mode = CS_MODE_64;
 	}
 
+	if (arch_mode=="ppc32be") {
+		arch = CS_ARCH_PPC;
+		mode = (cs_mode)(CS_MODE_32|CS_MODE_BIG_ENDIAN);
+	}
+
+	if (arch_mode=="ppc64be") {
+		arch = CS_ARCH_PPC;
+		mode = (cs_mode)(CS_MODE_64|CS_MODE_BIG_ENDIAN);
+	}
+
 	if (arch_mode=="sparc") {
 		arch = CS_ARCH_SPARC;
 		mode = CS_MODE_LITTLE_ENDIAN; //default
